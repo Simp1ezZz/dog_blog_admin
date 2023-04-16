@@ -7,7 +7,6 @@ import IconsResolver from 'unplugin-icons/resolver'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
-// @ts-ignore
 import ElementPlus from 'unplugin-element-plus/vite'
 import path from 'path'
 

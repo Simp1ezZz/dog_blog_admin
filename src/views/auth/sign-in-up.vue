@@ -11,18 +11,17 @@
         </div>
         <span class="form_span">选择登录方式或电子邮箱登录</span>
         <input
-          v-model="loginData.username"
+          v-model="signInData.username"
           type="text"
           class="form_input"
           placeholder="用户名/邮箱"
         />
-        <input v-model="loginData.password" type="text" class="form_input" placeholder="密码" />
+        <input v-model="signInData.password" type="text" class="form_input" placeholder="密码" />
         <a class="form_link">忘记密码？</a>
-        <button type="button" @click="doLogin" class="form_button button submit-btn">
+        <button type="button" @click="doSignIn" class="form_button button submit-btn">
           SIGN IN
         </button>
       </div>
-
     </div>
 
     <div class="container b-container" id="b-container">
@@ -34,10 +33,10 @@
           <i class="iconfont icon-bilibili-line"></i>
         </div>
         <span class="form_span">选择注册方式或电子邮箱注册</span>
-        <input type="text" class="form_input" placeholder="Name" />
-        <input type="text" class="form_input" placeholder="Email" />
-        <input type="text" class="form_input" placeholder="Password" />
-        <button type="button" @click="" class="form_button button submit-btn">SIGN UP</button>
+        <input v-model="signUpData.username" type="text" class="form_input" placeholder="用户名" />
+        <input v-model="signUpData.email" type="text" class="form_input" placeholder="邮箱" />
+        <input v-model="signUpData.password" type="text" class="form_input" placeholder="密码" />
+        <button type="button" @click="doSignUp" class="form_button button submit-btn">SIGN UP</button>
       </div>
     </div>
 
@@ -52,7 +51,7 @@
         <button @click="changeForm" class="switch_button button switch-btn">SIGN IN</button>
       </div>
 
-      <div class="switch_container " id="switch-c2">
+      <div class="switch_container" id="switch-c2">
         <h2 class="switch_title title" style="letter-spacing: 0">Hello Friend！</h2>
         <p class="switch_description description">
           去注册一个账号，成为尊贵的粉丝会员，让我们踏入奇妙的旅途！
@@ -64,17 +63,22 @@
 </template>
 
 <script setup lang="ts">
-import request from "@/utils/request";
+import request from '@/utils/request'
+import { setToken } from "@/utils/auth";
 
-const loginData = reactive({
+const signInData = reactive({
   username: '',
   password: ''
 })
-
+const signUpData = reactive({
+  username: '',
+  password: '',
+  email:''
+})
 let switchCtn: Element | null
 let switchC1: Element | null
 let switchC2: Element | null
-let switchCircle: NodeListOf<Element> | { classList: { toggle: (arg0: string) => void } }[]
+let switchCircle: NodeListOf<Element>
 let aContainer: Element | null
 let bContainer: Element | null
 onMounted(() => {
@@ -100,14 +104,26 @@ onMounted(() => {
   // changeForm()
 })
 
-const doLogin = () => {
+const doSignIn = () => {
   request({
     method: 'post',
-    url:'system/auth/login',
+    url: 'system/auth/login',
+    headers: {
+      fetchToken: true
+    },
+    data: signInData
+  }).then((res)=>{
+    setToken(res.data.accessToken)
+  })
+}
+const doSignUp = ()=>{
+  request({
+    method: 'post',
+    url:'system/auth/register',
     headers:{
       fetchToken: true
     },
-    data:loginData
+    data:signUpData
   })
 }
 let changeForm = () => {

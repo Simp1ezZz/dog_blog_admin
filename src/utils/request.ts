@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken } from '@/utils/auth'
 import qs from 'qs'
-import { ElNotification } from "element-plus";
+import { ElNotification } from 'element-plus'
 //axios默认content-type设为json，字符集设为utf-8
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8'
 
@@ -21,46 +21,54 @@ request.interceptors.request.use(
       config.headers['Authorization'] = 'Bearer ' + getToken()
     }
     if (config.method === 'get') {
-      let url = config.url + '?' + qs.stringify(config.params)
+      const url = config.url + '?' + qs.stringify(config.params)
       config.params = {}
       config.url = url
     }
     return config
   },
   (error) => {
-    console.log(error)
-    Promise.reject(error).then()
+    Promise.reject(error).catch(()=>{
+      ElNotification({
+        title: '出错了QAQ',
+        message: '系统错误，请稍后再试',
+        type: 'error'
+      })
+    })
   }
 )
 
 request.interceptors.response.use(
   (res) => {
-    console.log(res);
-    const code: string = res.data.code+''
+    const code: string = res.data.code + ''
     const msg: string = res.data.msg || '系统未知错误，请反馈给管理员'
     if (res.request.responseType === 'blob' || res.request.responseType === 'arraybuffer') {
       return res.data
     }
-    debugger
-    console.log(code);
     if (code === '0') {
       ElNotification({
         title: '请求成功！',
-        message: res.data.msg||'请求成功啦！',
-        type: 'success',
+        message: res.data.msg || '请求成功啦！',
+        type: 'success'
       })
     }
     if (code !== '0') {
       ElNotification({
-        title: '出错啦！',
+        title: '出错了QAQ',
         message: msg,
-        type: 'error',
+        type: 'error'
       })
     }
-    return res
+    return Promise.resolve(res.data)
   },
   (error) => {
-    Promise.reject(error).then()
+    Promise.reject(error).catch(()=>{
+      ElNotification({
+        title: '出错了QAQ',
+        message: '系统错误，请稍后再试',
+        type: 'error'
+      })
+    })
   }
 )
 
